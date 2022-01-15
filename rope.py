@@ -290,3 +290,9 @@ class Rope:
     def substring(self, start, stop):
         chars = self.inOrder(start, stop)
         return "".join(chars)
+
+    def get_nNodes(self):
+        if self.root:
+            return self.root.nNodes
+        else:
+            return 0
