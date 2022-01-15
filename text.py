@@ -13,8 +13,8 @@ class Text:
         self.rope.extend(string)
     
     def insert(self, index, string):
-        for i in range(index, index + len(string)):
-            self.insert(i, string[i])
+        for i, char in zip(range(index, index + len(string)), string):
+            self.rope.insert(i, char)
     
     def subtext(self, start, stop):
         return self.rope.substring(start, stop)
@@ -30,3 +30,7 @@ class Text:
     def remove(self, start, stop):
         temp_rope = self.rope.slice(start, stop)
         del temp_rope
+    
+    def __str__(self):
+        return self.subtext(0, self.rope.get_nNodes())
+        

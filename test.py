@@ -1,6 +1,7 @@
 from rope import Rope
+from text import Text
 
-def main():
+def rope_test():
     rope = Rope()
     # for i, char in enumerate("helloworld"):
     #     rope.insert(char, i)
@@ -32,6 +33,21 @@ def main():
     rope.join(7, rope2)
 
     print(rope.substring(0, 10))
+
+def main():
+    text = Text("abcdefghijklmnop")
+    print(text)
+    text.append("qrstuvwxyz")
+    print(text)
+    text.insert(5, "ven")
+    print(text)
+    text.cut(3, 8)
+    print(text)
+    text.paste(0)
+    print(text)
+    text.remove(0, 5)
+    print(text)
+    print(text.subtext(3, 13))
 
 if __name__ == "__main__":
     main()
