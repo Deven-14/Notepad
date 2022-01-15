@@ -69,10 +69,6 @@ class Rope:
         node = node.right
         left_node.update_right(node.left)
         node.update_left(left_node)
-        # left_node.right = node.left
-        # node.left = left_node
-        # left_node.nNodes = left_node.sum_of_nodes_of_sub_trees() + 1
-        # node.nNodes = node.sum_of_nodes_of_sub_trees() + 1
         return node
     
 
@@ -81,10 +77,6 @@ class Rope:
         node = node.left
         right_node.update_left(node.right)
         node.update_right(right_node)
-        # right_node.left = node.right
-        # node.right = right_node
-        # right_node.nNodes = right_node.sum_of_nodes_of_sub_trees() + 1
-        # node.nNodes = node.sum_of_nodes_of_sub_trees() + 1
         return node
 
 
@@ -95,8 +87,6 @@ class Rope:
         
         position = index + 1
         node_pos = node.get_position()
-        # if position == node_pos:
-        #     return node
         
         if position < node_pos:
 
@@ -142,7 +132,7 @@ class Rope:
         self.root = self.splay_util(self.root, index)
 
 
-    def insert(self, char, index):
+    def insert(self, index, char):
         
         if self.root == None:
             self.root = Node(char)
@@ -159,22 +149,30 @@ class Rope:
         
         new_node = Node(char)
         if position < node_pos:
-            # new_node.left = self.root.left
-            # self.root.left = None
-            # self.root.nNodes = self.root.sum_of_nodes_of_sub_trees() + 1
-            # new_node.right = self.root
             left_node = self.root.remove_left()
             new_node.update_left_right(left_node, self.root)
         else:
-            # new_node.right = self.root.right
-            # self.root.right = None
-            # self.root.nNodes = self.root.sum_of_nodes_of_sub_trees() + 1
-            # new_node.left = self.root
             right_node = self.root.remove_right()
             new_node.update_left_right(self.root, right_node)
             
-        # new_node.nNodes = new_node.sum_of_nodes_of_sub_trees() + 1
         self.root = new_node
+
+
+    def append(self, char):
+        if self.root == None:
+            return self.insert(0, char)
+            
+        self.insert(self.root.nNodes, char)
+    
+
+    def extend(self, string):
+        if self.root == None:
+            for i in range(len(string)):
+                self.insert(i, string[i])
+            return
+
+        for char in string:
+            self.insert(self.root.nNodes, char)
 
 
     def split(self, node, index):
@@ -186,19 +184,10 @@ class Rope:
         node = self.splay_util(node, index)
         node_pos = node.get_position()
 
-        # pair = Pair()
         if position <= node_pos:
-            # pair.first = node.left
-            # node.left = None
-            # node.nNodes = node.sum_of_nodes_of_sub_trees() + 1
-            # pair.second = node
             left_node = node.remove_left()
             pair = Pair(left_node, node)
         else:
-            # pair.second = node.right
-            # node.right = None
-            # node.nNodes = node.sum_of_nodes_of_sub_trees() + 1
-            # pair.first = node
             right_node = node.remove_right()
             pair = Pair(node, right_node)
         
@@ -212,16 +201,12 @@ class Rope:
         if right == None:
             return left
 
-        # left = self.splay_util(left, math.inf)
-        # node = left
-        # node.right = right
-        # node.nNodes = node.sum_of_nodes_of_sub_trees() + 1
         node = self.splay_util(left, math.inf-1)
         node.update_right(right)
         return node
 
 
-    def cut(self, start, stop):
+    def slice(self, start, stop):
 
         pair1 = self.split(self.root, start)
         pair2 = self.split(pair1.second, stop - start) # + 1
@@ -235,7 +220,7 @@ class Rope:
         return new_rope
 
 
-    def paste(self, rope, index):
+    def join(self, index, rope):
         if rope == None:
             return
         
@@ -250,13 +235,11 @@ class Rope:
         chars = []
 
         self.splay(start)
-        if self.root.get_position()-1 < start:
+        index = self.root.get_position()-1
+        n_chars = stop - start
+        if index < start or index >= stop or n_chars == 0:
             return ""
 
-        n_chars = stop - start
-        if n_chars == 0:
-            return ""
-        
         chars.append(self.root.char)
         len_chars = len(chars) # = 1
         curr = self.root.right
@@ -274,7 +257,8 @@ class Rope:
         
         return chars
 
-    def print_node(self, node): # inclusive of start, exclusive of stop
+
+    def print_node_(self, node):
         stack = []
         chars = []
         
@@ -291,20 +275,18 @@ class Rope:
         
         print("".join(chars))
 
-    # def search(self, index):
-    #     self.splay(index)
-    #     return self.root.char # return char # CHANGE THIS LATER
-    # def get(self, index):
-    #     self.splay(index)
-    #     if index + 1 == self.root.get_position():
-    #         return self.root.char
-    #     else:
-    #         return ""
+
+    def get(self, index):
+        self.splay(index)
+        if index + 1 == self.root.get_position():
+            return self.root.char
+        else:
+            return ""
         
 
-    # def get(self, start, stop, step=1):
+    # def substring(self, start, stop, step=1):
     #     chars = self.inOrder(start, stop)
     #     return "".join(chars[::step])
-    def get(self, start, stop):
+    def substring(self, start, stop):
         chars = self.inOrder(start, stop)
         return "".join(chars)
